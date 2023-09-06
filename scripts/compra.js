@@ -7,7 +7,9 @@ class SurtidoProduct {
         this.price = price
     }
 
-    saveProduct(product) {
+    static getAllProducts = () => JSON.parse(localStorage.getItem(STORAGE_KEY_SURTIDOS))
+
+    static saveProduct(product) {
         let allProducts = this.getAllProducts()
 
         if (!allProducts)
@@ -17,60 +19,35 @@ class SurtidoProduct {
         localStorage.setItem(STORAGE_KEY_SURTIDOS, JSON.stringify(allProducts))
     }
 
-    insertProduct(product) {
+    static insertProduct(product) {
         let liProduct = document.createElement("li")
-        let inputCheck = document.createElement("input");
-        inputCheck.classList.add("form-check-input")
-        inputCheck.type = "checkbox"
-        inputCheck.id = "checkbox_" + product.name;
-        inputCheck.addEventListener("click", new SurtidoProduct().#event_updateProductStatus);
+        liProduct.classList.add("list-group-item")
+        liProduct.id = product.name
+        liProduct.innerHTML = `${product.name} <b>  $ ${product.price}</b>`
+        // liProduct.appendChild(document.createTextNode(`${product.name} <b>  $ ${product.price}</b>`))
 
-        let label = document.createElement("label");
-        label.classList.add("form-check-label");
-        label.for = inputCheck.id;
-        label.appendChild(document.createTextNode(product.name));
-        label.addEventListener("dblclick", new SurtidoProduct().#event_removeProduct);
+        liProduct.addEventListener("dblclick", new SurtidoProduct().#event_removeProduct);
 
-        if (product.finished) {
-            label.classList.add("line-through");
-            inputCheck.checked = true;
-        }
-        liProduct.appendChild(inputCheck);
-        liProduct.appendChild(label);
-        document.getElementById("all_pre_products").appendChild(liProduct);
+        document.getElementById("products_list").appendChild(liProduct);
     }
 
     #event_removeProduct(evt) {
         if (confirm("¿Seguro que deseas eliminar el producto de la lista?")) {
-            const label = evt.srcElement
-            const nameProduct = label.textContent
+            const liElement = evt.srcElement
+            const nameProduct = liElement.id
             // remove product from Storage:
-            Product.removeProduct(nameProduct)
+            SurtidoProduct.removeProduct(nameProduct)
             // remove product from view:
-            label.parentElement.parentElement.removeChild(label.parentElement)
+            liElement.parentElement.removeChild(liElement)
+            updateLabelImporteTotal()
         }
     }
 
-    #event_updateProductStatus(evt) {
-        const element = evt.srcElement;
-        let productName = element.id.split('_')[1];
-        // remove line from label:
-        const label = element.parentElement.childNodes[1]
-        // debugger;
-        if (element.checked) {
-            label.classList.add("line-through");
-        } else {
-            label.classList.remove("line-through");
-        }
-        // updated preProduct in local storage:
-        Product.updateProductStatus(productName);
-    }
-
-    removeProduct(type) {
-        const allProducts = getAllProducts(type)
+    static removeProduct(productName) {
+        const allProducts = this.getAllProducts()
 
         for (let index in allProducts) {
-            if (allProducts[index].name == this.name) {
+            if (allProducts[index].name == productName) {
                 allProducts.splice(index, 1)
                 break
             }
@@ -78,25 +55,26 @@ class SurtidoProduct {
         localStorage.setItem(STORAGE_KEY_SURTIDOS, JSON.stringify(allProducts))
     }
 
-    static updateProductStatus(productName) {
-        const allProducts = this.getAllProducts()
-        for (let product of allProducts) {
-            if (product.name === productName) {
-                product.finished = (!product.finished)
-                break
-            }
-        }
-
-        localStorage.setItem(STORAGE_KEY_SURTIDOS, JSON.stringify(allProducts))
-    }
-
 }
 
 
 const btnInsertProduct = document.getElementById("saveProduct")
-const productsList = document.getElementById("products_list")
 const productNameImput = document.getElementById("productNameImput")
 const productPriceImput = document.getElementById("productPriceImput")
+const labelImporteTotal = document.getElementById("importeTotal")
+
+
+function updateLabelImporteTotal() {
+
+    let total = 0
+    SurtidoProduct.getAllProducts().forEach(prod => total += prod.price)
+
+    if (labelImporteTotal.firstChild) {
+        labelImporteTotal.removeChild(labelImporteTotal.firstChild)
+    }
+
+    labelImporteTotal.appendChild(document.createTextNode(`Importe total: $ ${total}`))
+}
 
 
 btnInsertProduct.addEventListener("click", (evt) => {
@@ -105,12 +83,14 @@ btnInsertProduct.addEventListener("click", (evt) => {
     const price = productPriceImput.value
 
     if (name && price) {
-        const product = new SurtidoProduct(name, price, false)
-        product.insertProduct(product)
-        product.saveProduct(product)
+        const product = new SurtidoProduct(name, parseFloat(price), false)
+
+        SurtidoProduct.insertProduct(product)
+        SurtidoProduct.saveProduct(product)
 
         productNameImput.value = ""
         productPriceImput.value = ""
+        updateLabelImporteTotal()
     }
 })
 
@@ -120,6 +100,7 @@ addEventListener("DOMContentLoaded", () => {
 
     if (allProducts !== null && allProducts.length > 0) {
         allProducts.forEach(product => SurtidoProduct.insertProduct(product))
+        updateLabelImporteTotal()
     }
 })
 
