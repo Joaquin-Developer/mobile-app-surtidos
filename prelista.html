@@ -10,7 +10,11 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm"
         crossorigin="anonymous"></script>
+    <script src="scripts/utils.js"></script>
+    <script defer src="scripts/storage.js"></script>
+    <script defer src="scripts/compra.js"></script>
     <script defer src="scripts/precompra.js"></script>
+    <script defer src="scripts/precompra.controller.js"></script>
 </head>
 
 <body>
@@ -33,12 +37,8 @@
                 </ul>
             </div>
         </div>
-
     </nav>
     <div class="container">
-
-        <!-- <div id="error_alert_remove_pre_product" class="alert alert-danger none" role="alert"></div>
-        <div id="success_alert_remove_pre_product" class="alert alert-success none" role="alert"></div> -->
         <h2>Pre-lista de compras:</h2>
         <div class="pre_products_add">
             <div class="form_new_pre_products col-8">
@@ -53,9 +53,12 @@
                 <ul id="all_pre_products"></ul>
             </div>
         </div>
-
-
     </div>
+    <footer class="bg-dark text-light py-3" style="position: absolute; bottom: 0; width: 100%;">
+        <div class="container text-center">
+            <p>Desarrollo por. <a href="https://twitter.com/JoaqDeveloper">Joaquín Parrilla</a> | Ssr. Data Engineer</p>
+        </div>
+    </footer>
 </body>
 
 </html>
