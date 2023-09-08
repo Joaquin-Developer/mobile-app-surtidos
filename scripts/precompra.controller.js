@@ -6,9 +6,8 @@ const inputNewPreProduct = document.getElementById("newPreProduct")
 btnNewPreProduct.addEventListener("click", (evt) => {
     evt.preventDefault()
     const name = inputNewPreProduct.value
-    const price = inputNewPreProduct.value
 
-    if (name && price) {
+    if (name) {
         const product = new PreProduct(name, false)
         PreProduct.insert(product)
 
