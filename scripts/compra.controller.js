@@ -1,5 +1,6 @@
 
 const btnInsertProduct = document.getElementById("saveProduct")
+const btnClearList = document.getElementById("clearSurtidosList")
 const productNameImput = document.getElementById("productNameImput")
 const productPriceImput = document.getElementById("productPriceImput")
 const labelImporteTotal = document.getElementById("importeTotal")
@@ -32,6 +33,12 @@ btnInsertProduct.addEventListener("click", (evt) => {
         productPriceImput.value = ""
         updateLabelImporteTotal()
     }
+})
+
+
+btnClearList.addEventListener("click", (evt) => {
+    evt.preventDefault()
+    SurtidoProduct.clearProductsList()
 })
 
 

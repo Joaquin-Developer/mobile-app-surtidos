@@ -68,4 +68,10 @@ class SurtidoProduct {
         return true
     }
 
+    static clearProductsList() {
+        // remove all elements in Surtidos list
+        localStorage.setItem(STORAGE_KEY_SURTIDOS, JSON.stringify([]))
+        location.reload()
+    }
+
 }
