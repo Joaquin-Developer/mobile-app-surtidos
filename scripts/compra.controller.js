@@ -3,6 +3,7 @@ const btnInsertProduct = document.getElementById("saveProduct")
 const btnClearList = document.getElementById("clearSurtidosList")
 const productNameImput = document.getElementById("productNameImput")
 const productPriceImput = document.getElementById("productPriceImput")
+const productQuantityInput = document.getElementById("productQuantityInput")
 const labelImporteTotal = document.getElementById("importeTotal")
 
 
@@ -22,17 +23,20 @@ function updateLabelImporteTotal() {
 btnInsertProduct.addEventListener("click", (evt) => {
     evt.preventDefault()
     const name = productNameImput.value
-    const price = productPriceImput.value
+    const price = productPriceImput.value * (productQuantityInput.value || 1)
 
-    if (name && price) {
+    try {
         const product = new SurtidoProduct(name, parseFloat(price), false)
-
         SurtidoProduct.insert(product)
 
+    } catch (error) {
+        alert(error.message)
+    } finally {
         productNameImput.value = ""
         productPriceImput.value = ""
         updateLabelImporteTotal()
     }
+
 })
 
 

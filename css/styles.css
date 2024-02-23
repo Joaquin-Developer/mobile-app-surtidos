@@ -2,3 +2,17 @@
     position: relative;
     min-height: 100vh;
 } */
+
+
+/* index.html inputs: */
+#productNameImput {
+    width: 40%;
+}
+
+#productPriceImput {
+    width: 30%;
+}
+
+#productQuantityInput {
+    width: 10%;
+}

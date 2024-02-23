@@ -1,9 +1,14 @@
 
 class SurtidoProduct {
     constructor(name, price) {
+        if (!name || !price || price <= 0) {
+            throw new RangeError("Errores en los valores.")
+        }
+
         this.id = SurtidoProduct.getNewProductId()
         this.name = name
         this.price = price
+
     }
 
     static getAllProducts = () => JSON.parse(localStorage.getItem(STORAGE_KEY_SURTIDOS))
@@ -30,7 +35,7 @@ class SurtidoProduct {
         liProduct.innerHTML = `${product.name} <b>  $ ${product.price}</b>`
         // liProduct.appendChild(document.createTextNode(`${product.name} <b>  $ ${product.price}</b>`))
 
-        liProduct.addEventListener("dblclick", new SurtidoProduct().#event_removeProduct);
+        liProduct.addEventListener("dblclick", SurtidoProduct.#event_removeProduct);
 
         document.getElementById("products_list").appendChild(liProduct);
     }
@@ -40,7 +45,7 @@ class SurtidoProduct {
         SurtidoProduct.insertInStorage(product)
     }
 
-    #event_removeProduct(evt) {
+    static #event_removeProduct(evt) {
         if (confirm("¿Seguro que deseas eliminar el producto de la lista?")) {
             const liElement = evt.srcElement
             const idProduct = liElement.id.split('_')[1]
