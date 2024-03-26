@@ -34,6 +34,7 @@ btnInsertProduct.addEventListener("click", (evt) => {
     } finally {
         productNameImput.value = ""
         productPriceImput.value = ""
+        productQuantityInput.value = "1"
         updateLabelImporteTotal()
     }
 
