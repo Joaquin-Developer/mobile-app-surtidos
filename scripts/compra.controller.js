@@ -7,27 +7,26 @@ const productQuantityInput = document.getElementById("productQuantityInput")
 const labelImporteTotal = document.getElementById("importeTotal")
 
 
-function updateLabelImporteTotal() {
-
-    let total = 0
-    SurtidoProduct.getAllProducts().forEach(prod => total += prod.price)
-
+function updateLabelImporteTotal(totalPrice) {
     if (labelImporteTotal.firstChild) {
         labelImporteTotal.removeChild(labelImporteTotal.firstChild)
     }
 
-    labelImporteTotal.appendChild(document.createTextNode(`Importe total: $ ${total}`))
+    labelImporteTotal.appendChild(document.createTextNode(`Importe total: $ ${totalPrice}`))
 }
 
 
-btnInsertProduct.addEventListener("click", (evt) => {
+btnInsertProduct.addEventListener("click", async (evt) => {
     evt.preventDefault()
     const name = productNameImput.value
-    const price = productPriceImput.value * (productQuantityInput.value || 1)
+    const quantity = productQuantityInput.value || 1
+    const price = productPriceImput.value
+    let totalPrice = undefined
 
     try {
-        const product = new SurtidoProduct(name, parseFloat(price), false)
-        SurtidoProduct.insert(product)
+        const product = new SurtidoProduct(name, parseFloat(price), quantity)
+        totalPrice = await SurtidoProduct.insert(product)
+        updateLabelImporteTotal(totalPrice)
 
     } catch (error) {
         alert(error.message)
@@ -35,23 +34,27 @@ btnInsertProduct.addEventListener("click", (evt) => {
         productNameImput.value = ""
         productPriceImput.value = ""
         productQuantityInput.value = "1"
-        updateLabelImporteTotal()
     }
 
 })
 
 
-btnClearList.addEventListener("click", (evt) => {
+btnClearList.addEventListener("click", async (evt) => {
     evt.preventDefault()
-    SurtidoProduct.clearProductsList()
+    await SurtidoProduct.clearProductsList()
 })
 
 
 addEventListener("DOMContentLoaded", () => {
-    const allProducts = SurtidoProduct.getAllProducts()
+    const allProductsJSONData = SurtidoProduct.getAllProducts()
+
+    if (!allProductsJSONData || allProductsJSONData.length === 0)
+        return
+
+    const allProducts = allProductsJSONData["json_products"]
 
     if (allProducts !== null && allProducts.length > 0) {
         allProducts.forEach(product => SurtidoProduct.insertInUI(product))
-        updateLabelImporteTotal()
+        updateLabelImporteTotal(allProductsJSONData["total_price"])
     }
 })
