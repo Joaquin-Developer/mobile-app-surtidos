@@ -65,7 +65,7 @@ class PreProduct {
         }
     }
 
-    #event_updateProductStatus(evt) {
+    async #event_updateProductStatus(evt) {
         const element = evt.srcElement
         let productId = element.id.split('_')[1]
         // remove line from label:
@@ -78,13 +78,13 @@ class PreProduct {
 
         if (element.checked) {
             label.classList.add("line-through")
-            PreProduct.insertInSurtidosList(label.textContent)
+            await PreProduct.insertInSurtidosList(label.textContent)
         } else {
             label.classList.remove("line-through")
         }
     }
 
-    static insertInSurtidosList(productName) {
+    static async insertInSurtidosList(productName) {
         if (confirm("¿Desea agregar el producto en la lista del surtido actual?")) {
             const price = parseFloat(prompt("Ingrese precio en $$  (Usar el punto para decimales)"))
 
@@ -93,9 +93,9 @@ class PreProduct {
                 return
             }
 
-            const surtidoProduct = new SurtidoProduct(productName, price)
+            const surtidoProduct = new SurtidoProduct(productName, price, 1)
 
-            SurtidoProduct.insertInStorage(surtidoProduct)
+            await SurtidoProduct.insert(surtidoProduct, false)
         }
     }
 

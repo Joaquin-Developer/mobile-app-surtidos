@@ -92,9 +92,12 @@ class SurtidoProduct {
         document.getElementById("products_list").appendChild(liProduct);
     }
 
-    static async insert(product) {
+    static async insert(product, insertInUI = true) {
         const allProducts = SurtidoProduct.insertInStorage(product)
-        SurtidoProduct.insertInUI(product)
+
+        if (insertInUI)
+            SurtidoProduct.insertInUI(product)
+
         await SurtidoProduct.persistProduct(allProducts)
         return allProducts["total_price"]
     }
