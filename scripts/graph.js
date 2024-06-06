@@ -1,22 +1,23 @@
 
+function getUsername() {
+    const data = SurtidoProduct.getAllProducts()
+
+    if (!data || data.length === 0 || !Object.keys(data).includes("username"))
+        throw Error("Username not defined")
+
+    return data["username"]
+}
+
+
 async function getGata() {
-    const username = "Joaquin"
+    const username = getUsername()
     const URL = `${API_URL}/get_surtidos_data/${username}`
     const json = await (await fetch(URL)).json()
     return json
 }
 
 
-addEventListener("load", async () => {
-
-    const data = await getGata()
-    console.log(data)
-
-    if (!data || data.length === 0) {
-        alert("No hay data para mostrar")
-        return
-    }
-
+function showData(data) {
     const graphJsonData = { labels: [], data: [] }
 
     data.forEach(elem => {
@@ -56,4 +57,22 @@ addEventListener("load", async () => {
             }
         }
     })
+}
+
+
+addEventListener("load", async () => {
+    let data = null
+    try {
+        data = await getGata()
+
+        if (!data || data.length === 0)
+            throw Error("No data")
+
+        console.log(data)
+        showData(data)
+
+    } catch (error) {
+        alert("No hay data para mostrar")
+    }
+
 })
