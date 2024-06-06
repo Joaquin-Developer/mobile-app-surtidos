@@ -8,6 +8,9 @@ const labelImporteTotal = document.getElementById("importeTotal")
 
 
 function updateLabelImporteTotal(totalPrice) {
+    if (!totalPrice)
+        totalPrice = SurtidoProduct.getTotalPrice()
+
     if (labelImporteTotal.firstChild) {
         labelImporteTotal.removeChild(labelImporteTotal.firstChild)
     }

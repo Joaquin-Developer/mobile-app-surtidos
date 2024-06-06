@@ -30,8 +30,6 @@ class SurtidoProduct {
     }
 
     static async persistProduct(allProductsData) {
-        console.log("data enviada:", JSON.stringify([allProductsData]))
-
         try {
             const response = await fetch(`${API_URL}/save_surtido_data`, {
                 method: "POST",
@@ -42,17 +40,24 @@ class SurtidoProduct {
             if (!response.ok)
                 throw new Error("Network response was not ok " + response.statusText)
 
-            const jsonResponse = await response.json()
-            console.log(jsonResponse)
-            console.log("Data saved/updated on Servidor.")
+            console.log(await response.json())
         } catch (error) {
             console.error(error)
         }
     }
 
+    static calculateTotalPrice(productsJsonData) {
+        let total = 0
+        productsJsonData.forEach(prod => total += (prod.price * prod.quantity))
+        return total
+    }
+
+    static getTotalPrice() {
+        return JSON.parse(localStorage.getItem(STORAGE_KEY_SURTIDOS))["total_price"]
+    }
+
     static insertInStorage(product) {
         let allProducts = this.getAllProducts()
-        let totalPrice = 0
 
         if (!allProducts) {
             allProducts = {}
@@ -66,14 +71,13 @@ class SurtidoProduct {
         let jsonProductsList = allProducts["json_products"] || new Array()
 
         jsonProductsList.push(product)
-        jsonProductsList.forEach(prod => totalPrice += (prod.price * prod.quantity))
 
-        allProducts["total_price"] = totalPrice
+        allProducts["total_price"] = SurtidoProduct.calculateTotalPrice(jsonProductsList)
         allProducts["json_products"] = jsonProductsList
 
         localStorage.setItem(STORAGE_KEY_SURTIDOS, JSON.stringify(allProducts))
 
-        return [allProducts, totalPrice]
+        return allProducts
     }
 
     static insertInUI(product) {
@@ -89,18 +93,18 @@ class SurtidoProduct {
     }
 
     static async insert(product) {
+        const allProducts = SurtidoProduct.insertInStorage(product)
         SurtidoProduct.insertInUI(product)
-        const [allProducts, totalPrice] = SurtidoProduct.insertInStorage(product)
         await SurtidoProduct.persistProduct(allProducts)
-        return totalPrice
+        return allProducts["total_price"]
     }
 
-    static #event_removeProduct(evt) {
+    static async #event_removeProduct(evt) {
         if (confirm("¿Seguro que deseas eliminar el producto de la lista?")) {
             const liElement = evt.srcElement
             const idProduct = liElement.id.split('_')[1]
             // remove product from Storage:
-            const status = SurtidoProduct.removeProduct(idProduct)
+            const status = await SurtidoProduct.removeProduct(idProduct)
             // remove product from view:
             if (status) {
                 liElement.parentElement.removeChild(liElement)
@@ -109,17 +113,20 @@ class SurtidoProduct {
         }
     }
 
-    static removeProduct(productId) {
+    static async removeProduct(productId) {
         const allProducts = this.getAllProducts()
-        const index = binarySearch(allProducts, parseInt(productId))
+        const index = binarySearch(allProducts["json_products"], parseInt(productId))
 
         if (index == null) {
             alert("Error: No se encontró el producto")
             return false
         }
         // remove element from array:
-        allProducts.splice(index, 1)
+        allProducts["json_products"].splice(index, 1)
+        allProducts["total_price"] = SurtidoProduct.calculateTotalPrice(allProducts["json_products"])
         localStorage.setItem(STORAGE_KEY_SURTIDOS, JSON.stringify(allProducts))
+        // update data in API:
+        await SurtidoProduct.persistProduct(allProducts)
         return true
     }
 
