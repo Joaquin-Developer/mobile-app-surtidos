@@ -17,11 +17,20 @@ async function getGata() {
 }
 
 
+function dateToString(stringDate) {
+    const date = new Date(stringDate).toLocaleString('es-UY', {
+        month: 'long', year: 'numeric'
+    })
+
+    return date.charAt(0).toUpperCase() + date.slice(1)
+}
+
+
 function showData(data) {
     const graphJsonData = { labels: [], data: [] }
 
     data.forEach(elem => {
-        graphJsonData.labels.push(elem.audit_date)
+        graphJsonData.labels.push(dateToString(elem.audit_date))
         graphJsonData.data.push(elem.total_price)
     })
 

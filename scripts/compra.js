@@ -30,6 +30,7 @@ class SurtidoProduct {
     }
 
     static async persistProduct(allProductsData) {
+        allProductsData["audit_date"] = getActualDate()
         try {
             const response = await fetch(`${API_URL}/save_surtido_data`, {
                 method: "POST",
