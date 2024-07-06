@@ -17,7 +17,22 @@ btnNewPreProduct.addEventListener("click", (evt) => {
 })
 
 
-addEventListener("DOMContentLoaded", () => {
+addEventListener("DOMContentLoaded", async () => {
+    const tokenData = localStorage.getItem(STORAGE_KEY_SESSION_TOKEN)
+
+    if (!tokenData)
+        window.location.href = "login.html"
+
+    await validateToken()
+
+    try {
+        const data = JSON.parse(tokenData)
+        if (!data.access_token || !data.username)
+            window.location.href = "login.html"
+    } catch (error) {
+        console.error(error)
+    }
+
     const allProducts = PreProduct.getAllProducts()
 
     if (allProducts !== null && allProducts.length > 0) {
