@@ -1,6 +1,6 @@
 
 function getUsername() {
-    const data = SurtidoProduct.getAllProducts()
+    const data = getTokenData()
 
     if (!data || data.length === 0 || !Object.keys(data).includes("username"))
         throw Error("Username not defined")
@@ -11,9 +11,17 @@ function getUsername() {
 
 async function getGata() {
     const username = getUsername()
+    const token = getAccessToken()
+    await validateToken()
+
     const URL = `${API_URL}/get_surtidos_data/${username}`
-    const json = await (await fetch(URL)).json()
-    return json
+
+    const resp = await fetch(URL, {
+        method: "GET",
+        headers: { "Authorization": "Bearer " + token }
+    })
+
+    return await resp.json()
 }
 
 
@@ -70,8 +78,17 @@ function showData(data) {
 
 
 addEventListener("load", async () => {
+    const tokenData = localStorage.getItem(STORAGE_KEY_SESSION_TOKEN)
+
+    if (!tokenData)
+        window.location.href = "login.html"
+
     let data = null
     try {
+        const data = JSON.parse(tokenData)
+        if (!data.access_token || !data.username)
+            window.location.href = "login.html"
+
         data = await getGata()
 
         if (!data || data.length === 0)
@@ -81,6 +98,7 @@ addEventListener("load", async () => {
         showData(data)
 
     } catch (error) {
+        console.error(error)
         alert("No hay data para mostrar")
     }
 

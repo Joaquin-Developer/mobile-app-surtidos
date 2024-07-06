@@ -38,3 +38,31 @@ function getActualDate() {
     const seg = String(now.getSeconds()).padStart(2, '0')
     return `${year}-${month}-${day} ${hh}:${min}:${seg}`
 }
+
+
+function getTokenData() {
+    return JSON.parse(localStorage.getItem(STORAGE_KEY_SESSION_TOKEN))
+}
+
+
+function getAccessToken() {
+    return getTokenData().access_token
+}
+
+
+// Validate access token
+async function validateToken() {
+    const token = getAccessToken()
+
+    const resp = await fetch(`${API_URL}/validate_token`, {
+        method: "GET",
+        headers: { "Authorization": "Bearer " + token }
+    })
+
+    if (resp.status !== 200) {
+        alert("El tiempo de la session expiró. Deberá iniciar sesion nuevamente.")
+        localStorage.removeItem(STORAGE_KEY_SESSION_TOKEN)
+        window.location.href = "login.html"
+    }
+
+}

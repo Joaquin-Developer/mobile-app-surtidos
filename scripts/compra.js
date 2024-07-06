@@ -31,10 +31,13 @@ class SurtidoProduct {
 
     static async persistProduct(allProductsData) {
         allProductsData["audit_date"] = getActualDate()
+
         try {
+            const token = getAccessToken()
+
             const response = await fetch(`${API_URL}/save_surtido_data`, {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
+                headers: { "Content-Type": "application/json", "Authorization": "Bearer " + token },
                 body: JSON.stringify([allProductsData])
             })
 
@@ -60,14 +63,14 @@ class SurtidoProduct {
     static insertInStorage(product) {
         let allProducts = this.getAllProducts()
 
-        if (!allProducts) {
+        if (!allProducts)
             allProducts = {}
-            const username = prompt("Ingrese su nombre:")
-            if (!username) {
-                // throw error
-            }
-            allProducts["username"] = username
-        }
+
+        if (!Object.keys(allProducts).includes("username"))
+            allProducts["username"] = getTokenData().username
+
+        if (!Object.keys(allProducts).includes("user_id"))
+            allProducts["user_id"] = getTokenData().user_id
 
         let jsonProductsList = allProducts["json_products"] || new Array()
 
